@@ -73,19 +73,8 @@ class TestSignIn:
         assert mozwebqa.selenium.is_visible(logout_locator)
 
     def test_sign_in_returning_user(self, mozwebqa):
-        (email, password) = self.create_verified_user(mozwebqa.selenium,
-                                                      mozwebqa.timeout)
+        self.create_verified_user(mozwebqa.selenium, mozwebqa.timeout)
         mozwebqa.selenium.open('%s/' % mozwebqa.base_url)
-        login_locator = 'css=#loggedout button'
-        mozwebqa.wait_for_element_visible(mozwebqa, login_locator)
-        mozwebqa.selenium.click(login_locator)
-
-        from ...pages.rc.sign_in import SignIn
-        signin = SignIn(mozwebqa.selenium,
-                        mozwebqa.timeout,
-                        expect='returning')
-        assert signin.signed_in_email == email
-        signin.click_sign_in_returning_user()
         logout_locator = 'css=#loggedin a'
         mozwebqa.wait_for_element_visible(mozwebqa, logout_locator)
         assert mozwebqa.selenium.is_visible(logout_locator)

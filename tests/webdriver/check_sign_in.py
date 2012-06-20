@@ -71,20 +71,8 @@ class TestSignIn:
             lambda s: s.find_element_by_id('loggedin').is_displayed())
 
     def test_sign_in_returning_user(self, mozwebqa):
-        (email, password) = self.create_verified_user(mozwebqa.selenium,
-                                                      mozwebqa.timeout)
+        self.create_verified_user(mozwebqa.selenium, mozwebqa.timeout)
         mozwebqa.selenium.get('%s/' % mozwebqa.base_url)
-        WebDriverWait(mozwebqa.selenium, mozwebqa.timeout).until(
-            lambda s: s.find_element_by_id('loggedout').is_displayed())
-        mozwebqa.selenium.find_element_by_id('loggedout'). \
-            find_element_by_tag_name('button').click()
-
-        from ...pages.webdriver.sign_in import SignIn
-        signin = SignIn(mozwebqa.selenium,
-                        mozwebqa.timeout,
-                        expect='returning')
-        assert signin.signed_in_email == email
-        signin.click_sign_in_returning_user()
         WebDriverWait(mozwebqa.selenium, mozwebqa.timeout).until(
             lambda s: s.find_element_by_id('loggedin').is_displayed())
 
