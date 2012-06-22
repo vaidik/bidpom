@@ -4,7 +4,6 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import re
 import uuid
 
 import pytest
@@ -12,10 +11,11 @@ import pytest
 
 from ... import BrowserID
 from .. import restmail
+from base import BaseTest
 
 
 @pytest.mark.nondestructive
-class TestSignIn:
+class TestSignIn(BaseTest):
 
     def test_sign_in_helper(self, mozwebqa):
         browser_id = BrowserID(mozwebqa.selenium)
