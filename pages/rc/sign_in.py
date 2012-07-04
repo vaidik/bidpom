@@ -15,8 +15,8 @@ class SignIn(Base):
     _next_locator = 'css=button.start'
     _sign_in_locator = 'css=button.returning'
     _sign_in_returning_user_locator = 'id=signInButton'
-    _verify_email_locator = 'css=button.newuser'
-    _use_another_email_address_locator = 'id=back'
+    _verify_email_locator = 'id=verify_user'
+    _check_email_at_locator = 'css=#wait .contents h2 + p strong'
 
     def __init__(self, selenium, timeout, expect='new'):
         Base.__init__(self, selenium, timeout)
@@ -60,6 +60,21 @@ class SignIn(Base):
         """Set the value of the password field."""
         self.selenium.type(self._password_locator, value)
 
+    @property
+    def verify_password(self):
+        """Get the value of the verify password field."""
+        return self.selenium.get_text(self._verify_password_locator)
+
+    @password.setter
+    def verify_password(self, value):
+        """Set the value of the verify password field."""
+        self.selenium.type(self._verify_password_locator, value)
+
+    @property
+    def check_email_at_address(self):
+        """Get the value of the email address for confirmation."""
+        return self.selenium.get_text(self._check_email_at_locator)
+
     def click_next(self, expect='password'):
         """Clicks the 'next' button."""
         self.selenium.click(self._next_locator)
@@ -83,7 +98,7 @@ class SignIn(Base):
     def click_verify_email(self):
         """Clicks 'verify email' button."""
         self.selenium.click(self._verify_email_locator)
-        self.wait_for_element_visible(self._use_another_email_address_locator)
+        self.wait_for_element_visible(self._check_email_at_locator)
 
     def sign_in(self, email, password):
         """Signs in using the specified email address and password."""

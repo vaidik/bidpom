@@ -44,7 +44,7 @@ class TestSignIn(BaseTest):
         print 'signing in as %s@restmail.net' % restmail_username
         browser_id.sign_in('%s@restmail.net' % restmail_username)
         mail = restmail.get_mail(restmail_username)
-        assert 'Thanks for verifying' in mail[0]['text']
+        assert 'Click to confirm this email address' in mail[0]['text']
 
     @pytest.mark.travis
     def test_sign_in_new_user(self, mozwebqa):
@@ -56,10 +56,12 @@ class TestSignIn(BaseTest):
         signin.email = '%s@restmail.net' % restmail_username
         signin.click_next(expect='verify')
         signin.click_verify_email()
+        assert signin.check_email_at_address == email
+
         signin.close_window()
         signin.switch_to_main_window()
         mail = restmail.get_mail(restmail_username)
-        assert 'Thanks for verifying' in mail[0]['text']
+        assert 'Click to confirm this email address' in mail[0]['text']
 
     def test_sign_in_returning_user_helper(self, mozwebqa):
         self.create_verified_user(mozwebqa.selenium, mozwebqa.timeout)
