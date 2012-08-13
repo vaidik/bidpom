@@ -5,6 +5,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import pytest
+import time
 from selenium.webdriver.support.ui import WebDriverWait
 
 from .. import BrowserID
@@ -82,17 +83,26 @@ class TestSignIn(BaseTest):
         WebDriverWait(mozwebqa.selenium, mozwebqa.timeout).until(
             lambda s: s.find_element_by_id('loggedin').is_displayed())
 
-    def create_verified_user(self, selenium, timeout):
-        restmail_username = 'bidpom_%s' % uuid.uuid1()
-        email = '%s@restmail.net' % restmail_username
-        password = 'password'
-        browser_id = BrowserID(selenium, timeout)
-        browser_id.sign_in(email)
-        mail = restmail.get_mail(restmail_username)
-        verify_url = re.search(BrowserID.VERIFY_URL_REGEX,
-                               mail[0]['text']).group(0)
-        selenium.get(verify_url)
-        from ...pages.webdriver.verify_email_address import VerifyEmailAddress
-        verify_email_address = VerifyEmailAddress(selenium, timeout)
-        verify_email_address.verify_email_address(password)
-        return (email, password)
+    def test_sign_in_is_this_your_computer(self, mozwebqa):
+        browser_id = BrowserID(mozwebqa.selenium, mozwebqa.timeout)
+        browser_id.sign_in(mozwebqa.email, mozwebqa.password)
+
+        WebDriverWait(mozwebqa.selenium, mozwebqa.timeout).until(
+            lambda s: s.find_element_by_id('loggedin').is_displayed())
+        login_time = time.time()
+
+        self.log_out(mozwebqa.selenium, mozwebqa.timeout)
+
+        while time.time() < (login_time + 60):
+            time.sleep(15)
+            mozwebqa.selenium.find_element_by_css_selector('#loggedout button')
+
+        mozwebqa.selenium.find_element_by_css_selector('#loggedout button').click()
+
+        from .. pages.sign_in import SignIn
+        signin = SignIn(mozwebqa.selenium, mozwebqa.timeout, expect='returning')
+        signin.click_sign_in_returning_user(expect='remember')
+        signin.click_i_trust_this_computer()
+
+        WebDriverWait(mozwebqa.selenium, mozwebqa.timeout).until(
+            lambda s: s.find_element_by_id('loggedin').is_displayed())
