@@ -17,6 +17,7 @@ class SignIn(Base):
     _emails_locator = (By.CSS_SELECTOR, 'label[for^=email_]')
     _email_locator = (By.ID, 'email')
     _password_locator = (By.ID, 'password')
+    _verify_password_locator = (By.ID, 'vpassword')
     _next_locator = (By.CSS_SELECTOR, 'button.start')
     _sign_in_locator = (By.CSS_SELECTOR, 'button.returning')
     _sign_in_returning_user_locator = (By.ID, 'signInButton')
@@ -39,7 +40,7 @@ class SignIn(Base):
             for handle in self.selenium.window_handles:
                 self.selenium.switch_to_window(handle)
                 WebDriverWait(self.selenium, self.timeout).until(lambda s: s.title)
-                if self.selenium.title == self._page_title:
+                if self._page_title in self.selenium.title:
                     break
             else:
                 raise Exception('Popup has not loaded')
@@ -230,10 +231,12 @@ class SignIn(Base):
         self.password = password
         self.click_sign_in()
 
-    def sign_in_new_user(self, email):
+    def sign_in_new_user(self, email, password):
         """Requests verification email using the specified email address."""
         self.email = email
         self.click_next(expect='verify')
+        self.password = password
+        self.verify_password = password
         self.click_verify_email()
         self.close_window()
         self.switch_to_main_window()

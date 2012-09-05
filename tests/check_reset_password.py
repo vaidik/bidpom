@@ -40,7 +40,7 @@ class TestResetPassword(BaseTest):
         mail = restmail.get_mail(user.primary_email,
                                  message_count=2,
                                  timeout=mozwebqa.timeout)
-        assert 'Click to reset your password' in mail[1]['text']
+        assert 'This message is being sent to you to complete your sign-in' in mail[1]['text']
 
         reset_url = re.search(BrowserID.RESET_URL_REGEX,
             mail[1]['text']).group(0)
@@ -50,4 +50,4 @@ class TestResetPassword(BaseTest):
         complete_registration = CompleteRegistration(mozwebqa.selenium,
             mozwebqa.timeout,
             expect='success')
-        assert 'Your address has been verified!' in complete_registration.thank_you
+        assert 'Your new address is set up and ready to go.' in complete_registration.thank_you

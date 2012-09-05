@@ -45,7 +45,7 @@ class TestSignIn(BaseTest):
         print 'signing in as %s' % user.primary_email
         signin.sign_in_new_user(user.primary_email, 'password')
         mail = restmail.get_mail(user.primary_email, timeout=mozwebqa.timeout)
-        assert 'Click to confirm this email address' in mail[0]['text']
+        assert 'This message is being sent to you to complete your sign-in' in mail[0]['text']
 
     @pytest.mark.travis
     def test_sign_in_new_user(self, mozwebqa):
@@ -64,7 +64,7 @@ class TestSignIn(BaseTest):
         signin.close_window()
         signin.switch_to_main_window()
         mail = restmail.get_mail(user.primary_email, timeout=mozwebqa.timeout)
-        assert 'Click to confirm this email address' in mail[0]['text']
+        assert 'This message is being sent to you to complete your sign-in' in mail[0]['text']
 
     def test_sign_in_returning_user_helper(self, mozwebqa):
         self.create_verified_user(mozwebqa.selenium, mozwebqa.timeout)
