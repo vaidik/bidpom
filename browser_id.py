@@ -9,28 +9,17 @@ import selenium
 
 class BrowserID(object):
 
-    VERIFY_URL_REGEX = 'https?:\/\/(\S+)\/verify_email_address\?token=(\S+)'
+    VERIFY_URL_REGEX = 'https?:\/\/(\S+)\/verify_email_address\?token=(.{48})'
+    CONFIRM_URL_REGEX = 'https?:\/\/(\S+)\/add_email_address\?token=(.{48})'
+    RESET_URL_REGEX = 'https?:\/\/(\S+)\/verify_email_address\?token=(.{48})'
+    INCLUDE_URL_REGEX = '(https?:\/\/(\S+))\/include\.js'
 
-    def __init__(self, sel, timeout=60):
-        self.selenium = sel
-        setattr(self.selenium, 'rc', isinstance(self.selenium,
-                                                selenium.selenium))
+    def __init__(self, selenium, timeout=60):
+        self.selenium = selenium
         self.timeout = timeout
 
     def sign_in(self, email=None, password=None):
         """Signs in using the specified email address and password."""
-        if self.selenium.rc:
-            from pages.rc.sign_in import SignIn
-        else:
-            from pages.webdriver.sign_in import SignIn
-        if email and password:
-            sign_in = SignIn(self.selenium, timeout=self.timeout, expect='new')
-            sign_in.sign_in(email, password)
-        elif email:
-            sign_in = SignIn(self.selenium, timeout=self.timeout, expect='new')
-            sign_in.sign_in_new_user(email)
-        else:
-            sign_in = SignIn(self.selenium,
-                             timeout=self.timeout,
-                             expect='returning')
-            sign_in.sign_in_returning_user()
+        from pages.sign_in import SignIn
+        sign_in = SignIn(self.selenium, timeout=self.timeout, expect='new')
+        sign_in.sign_in(email, password)
