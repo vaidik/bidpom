@@ -24,6 +24,9 @@ class SignIn(Base):
     _sign_in_locator = (By.CSS_SELECTOR, 'button.isReturning')
     _sign_in_returning_user_locator = (By.ID, 'signInButton')
     _verify_email_locator = (By.ID, 'verify_user')
+    _gmail_email_locator = (By.CSS_SELECTOR, '#gaia_loginform #Email')
+    _gmail_password_locator = (By.CSS_SELECTOR, '#gaia_loginform #Passwd')
+    _gmail_sign_in_button_locator = (By.CSS_SELECTOR, '#gaia_loginform #signIn')
     _forgot_password_locator = (By.CSS_SELECTOR, '.isDesktop.forgotPassword')
     _reset_password_locator = (By.ID, 'password_reset')
     _confirm_message_locator = (By.XPATH, "//h2[.='Confirm your email address']")
@@ -153,6 +156,30 @@ class SignIn(Base):
         password.send_keys(value)
 
     @property
+    def gmail_email(self):
+        """Get the value of the email field from Gmail's login form."""
+        return self.selenium.find_element(*self._gmail_email_locator).get_attribute('value')
+
+    @gmail_email.setter
+    def gmail_email(self, value):
+        """Set the value of the email field in Gmail's login form."""
+        email = self.selenium.find_element(*self._gmail_email_locator)
+        email.clear()
+        email.send_keys(value)
+
+    @property
+    def gmail_password(self):
+        """Get the value of the password field from Gmail's login form."""
+        return self.selenium.find_element(*self._gmail_password_locator).get_attribute('value')
+
+    @gmail_password.setter
+    def gmail_password(self, value):
+        """Set the value of the password field in Gmail's login form."""
+        email = self.selenium.find_element(*self._gmail_password_locator)
+        email.clear()
+        email.send_keys(value)
+
+    @property
     def check_email_at_address(self):
         """Get the value of the email address for confirmation."""
         return self.selenium.find_element(*self._check_email_at_locator).text
@@ -173,12 +200,21 @@ class SignIn(Base):
             WebDriverWait(self.selenium, self.timeout).until(
                 lambda s: s.find_element(
                     *self._verify_email_locator).is_displayed())
+        elif expect == 'gmail':
+            WebDriverWait(self.selenium, self.timeout).until(
+                lambda s: s.find_element(
+                    *self._gmail_email_locator).is_displayed())
         else:
             raise Exception('Unknown expect value: %s' % expect)
 
     def click_sign_in(self):
         """Clicks the 'sign in' button."""
         self.selenium.find_element(*self._sign_in_locator).click()
+        self.switch_to_main_window()
+
+    def click_gmail_sign_in(self):
+        """Clicks the 'sign in' button in Gmail's login form."""
+        self.selenium.find_element(*self._gmail_sign_in_button_locator).click()
         self.switch_to_main_window()
 
     def click_sign_in_returning_user(self, expect='login'):
@@ -242,9 +278,15 @@ class SignIn(Base):
     def sign_in(self, email, password):
         """Signs in using the specified email address and password."""
         self.email = email
-        self.click_next(expect='password')
-        self.login_password = password
-        self.click_sign_in()
+        if 'gmail' in email:
+            self.click_next(expect='gmail')
+            self.gmail_email = email
+            self.gmail_password = password
+            self.click_gmail_sign_in()
+        else:
+            self.click_next(expect='password')
+            self.login_password = password
+            self.click_sign_in()
 
     def sign_in_new_user(self, email, password):
         """Requests verification email using the specified email address."""
