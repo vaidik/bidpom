@@ -278,7 +278,7 @@ class SignIn(Base):
     def sign_in(self, email, password):
         """Signs in using the specified email address and password."""
         self.email = email
-        if 'gmail' in email:
+        if 'gmail' or 'googlemail' in email:
             self.click_next(expect='gmail')
             self.gmail_email = email
             self.gmail_password = password
