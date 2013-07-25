@@ -37,6 +37,20 @@ class TestSignIn(BaseTest):
         WebDriverWait(mozwebqa.selenium, mozwebqa.timeout).until(
             lambda s: s.find_element_by_id('loggedin').is_displayed())
 
+    def test_sign_in_using_gmail(self, mozwebqa):
+        from .. pages.sign_in import SignIn
+        signin = SignIn(mozwebqa.selenium, mozwebqa.timeout, expect='new')
+        signin.email = mozwebqa.email
+        assert signin.email == mozwebqa.email, "email getter failed"
+        signin.click_next(expect='gmail')
+        signin.gmail_email = mozwebqa.email
+        signin.gmail_password = mozwebqa.password
+        assert signin.gmail_password == mozwebqa.password, "password getter failed"
+        signin.click_gmail_sign_in()
+
+        WebDriverWait(mozwebqa.selenium, mozwebqa.timeout).until(
+            lambda s: s.find_element_by_id('loggedin').is_displayed())
+
     @pytest.mark.travis
     def test_sign_in_new_user_helper(self, mozwebqa):
         user = MockUser()

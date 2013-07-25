@@ -25,6 +25,7 @@ class SignIn(Base):
     _sign_in_returning_user_locator = (By.ID, 'signInButton')
     _verify_email_locator = (By.ID, 'verify_user')
     _gmail_email_locator = (By.CSS_SELECTOR, '#gaia_loginform #Email')
+    _sign_in_with_gmail_button_locator = (By.CSS_SELECTOR, '.verifyWithPrimary')
     _gmail_password_locator = (By.CSS_SELECTOR, '#gaia_loginform #Passwd')
     _gmail_sign_in_button_locator = (By.CSS_SELECTOR, '#gaia_loginform #signIn')
     _forgot_password_locator = (By.CSS_SELECTOR, '.isDesktop.forgotPassword')
@@ -188,9 +189,10 @@ class SignIn(Base):
         """Clicks the 'next' button."""
 
         if self.selenium.find_element(*self._desktop_next_locator).is_displayed():
-            self.selenium.find_element(*self._desktop_next_locator).click()
+            next_locator = self.selenium.find_element(*self._desktop_next_locator)
         else:
-            self.selenium.find_element(*self._mobile_next_locator).click()
+            next_locator = self.selenium.find_element(*self._mobile_next_locator)
+        next_locator.click()
 
         if expect == 'password':
             WebDriverWait(self.selenium, self.timeout).until(
@@ -202,8 +204,16 @@ class SignIn(Base):
                     *self._verify_email_locator).is_displayed())
         elif expect == 'gmail':
             WebDriverWait(self.selenium, self.timeout).until(
-                lambda s: s.find_element(
-                    *self._gmail_email_locator).is_displayed())
+                lambda s: not next_locator.is_displayed())
+            try:
+                self.selenium.find_element(
+                    *self._sign_in_with_gmail_button_locator).click()
+            except:
+                pass
+            finally:
+                WebDriverWait(self.selenium, self.timeout).until(
+                    lambda s: s.find_element(
+                        *self._gmail_email_locator).is_displayed())
         else:
             raise Exception('Unknown expect value: %s' % expect)
 
